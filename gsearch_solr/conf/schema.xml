@@ -613,6 +613,10 @@
    <!-- <copyField source="*_t" dest="text" maxChars="3000"/> -->
    <copyField source="*_ms" dest="*_txt"/>
    <copyField source="pb_*" dest="pb_text_txt"/>
+   <copyField source="pb_date_*" dest="pb_date_ms"/>
+   <copyField source="pb_date_*" dest="pb_date_txt"/>
+   <copyField source="pb_parent_date_*" dest="pb_date_ms"/>
+   <copyField source="pb_parent_date_*" dest="pb_date_txt"/>
 
    <!-- copy name to alphaNameSort, a field designed for sorting by name -->
    <!-- <copyField source="name" dest="alphaNameSort"/> -->

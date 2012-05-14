@@ -578,16 +578,39 @@
       <xsl:param name="single_suffix">_s</xsl:param>  <!-- Suffix for fields with a single value -->
       <xsl:param name="suffix">_ms</xsl:param>       <!-- Suffix for multivalued fields -->
       
+      <!--  index dates (with types) -->
+      <xsl:for-each select="pb:pbcoreAssetDate">
+        <xsl:variable name="textValue" select="normalize-space(text())"/>
+        <xsl:variable name="dateType" select="translate(normalize-space(@dateType), ' ', '_')"/>
+        
+        <xsl:if test="$textValue">
+          <field>
+            <xsl:attribute name="name">
+              <xsl:choose>
+                <xsl:when test="$dateType">
+                  <xsl:value-of select="concat($prefix, 'date_', $dateType, $suffix)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat($prefix, 'date', $suffix)"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+            
+            <xsl:value-of select="$textValue"/>
+          </field>
+        </xsl:if>
+      </xsl:for-each>
+      
       <!-- index all descriptions (with type) -->
       <xsl:for-each select="pb:pbcoreDescription">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
-        <xsl:variable name="descType" select="normalize-space(@descriptionType)"/>
+        <xsl:variable name="descType" select="translate(normalize-space(@descriptionType), ' ', '_')"/>
         <xsl:if test="$textValue">
           <field>
             <xsl:attribute name="name">
               <xsl:choose>
                 <xsl:when test="$descType">
-                  <xsl:value-of select="concat($prefix, 'description_', 'custom', $suffix)"/>
+                  <xsl:value-of select="concat($prefix, 'description_', $descType, $suffix)"/>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of select="concat($prefix, 'description', $suffix)"/>
@@ -664,7 +687,8 @@
     <!-- index chunks of the instantiation itself -->
     <xsl:template match="pb:pbcoreInstantiation | pb:pbcoreInstantiationDocument">
       <xsl:param name="prefix">pb_</xsl:param>
-      <xsl:param name="suffix">_s</xsl:param>
+      <xsl:param name="single_suffix">_s</xsl:param>
+      <xsl:param name="suffix">_ms</xsl:param>
       
       <xsl:if test="local-name()='pbcoreInstantiationDocument'">
         <xsl:variable name="parent">
@@ -684,21 +708,24 @@ WHERE {
             <xsl:with-param name="lang">sparql</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
+        
         <xsl:for-each select="xalan:nodeset($parent)/sparql:sparql/sparql:results/sparql:result/sparql:parent">
           <xsl:variable name="ds_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', substring-after(@uri, '/'), '/datastreams/PBCORE/content')"/>
           <xsl:message>URL:  <xsl:value-of select="$ds_url"/></xsl:message>
           <xsl:apply-templates select="document($ds_url)/pb:pbcoreDescriptionDocument">
             <xsl:with-param name="prefix" select="concat($prefix, 'parent_')"/>
+            <xsl:with-param name="single_suffix" select="$single_suffix"/>
+            <xsl:with-param name="suffix" select="$suffix"/>
           </xsl:apply-templates>
         </xsl:for-each>
       </xsl:if>
       
-      <xsl:for-each select="pb:instantiationIdentifier[@source='instantiation_title']">
+      <xsl:for-each select="pb:instantiationIdentifier[@source='instantiation_title'] | pb:instantiationAnnotation[@annotationType='instantiation_title']">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
         <xsl:if test="$textValue">
           <field>
             <xsl:attribute name="name">
-              <xsl:value-of select="concat($prefix, 'title', $suffix)"/>
+              <xsl:value-of select="concat($prefix, 'title', $single_suffix)"/>
             </xsl:attribute>
             <xsl:value-of select="$textValue"/>
           </field>
@@ -710,7 +737,7 @@ WHERE {
         <xsl:if test="$textValue">
           <field>
             <xsl:attribute name="name">
-              <xsl:value-of select="concat($prefix, @annotationType, $suffix)"/>
+              <xsl:value-of select="concat($prefix, @annotationType, $single_suffix)"/>
             </xsl:attribute>
             <xsl:value-of select="$textValue"/>
           </field>
@@ -722,7 +749,7 @@ WHERE {
         <xsl:if test="$textValue">
           <field>
             <xsl:attribute name="name">
-              <xsl:value-of select="concat($prefix, 'duration', $suffix)"/>
+              <xsl:value-of select="concat($prefix, 'duration', $single_suffix)"/>
             </xsl:attribute>
             <xsl:value-of select="$textValue"/>
           </field>
