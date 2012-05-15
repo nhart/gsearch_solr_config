@@ -600,7 +600,7 @@
           </field>
           
           <xsl:choose>
-	          <xsl:when test="ends-with($dateType, 'End')">
+	          <xsl:when test="substring-before($dateType, 'End')">
 	            <field>
 	              <xsl:attribute name="name">
 	                <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'End'), $suffix)"/>
@@ -608,7 +608,7 @@
 	              <xsl:value-of select="$textValue"/>
 	            </field>
 	          </xsl:when>
-	          <xsl:when test="ends-with($dateType, 'Start')">
+	          <xsl:when test="substring-before($dateType, 'Start')">
               <field>
                 <xsl:attribute name="name">
                   <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'Start'), $suffix)"/>
