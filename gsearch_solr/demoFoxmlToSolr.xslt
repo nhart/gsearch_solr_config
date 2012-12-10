@@ -25,6 +25,7 @@
     xmlns:sparql="http://www.w3.org/2001/sw/DataAccess/rf1/result"
     xmlns:encoder="xalan://java.net.URLEncoder"
     exclude-result-prefixes="exts islandora-exts zs foxml dc oai_dc tei mods rdf rdfs fedora rel fractions compounds critters dwc fedora-model uvalibdesc pb uvalibadmin eaccpf xalan sparql encoder">
+    <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/gsearch_solr/xslt-date-template.xslt"/>
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
     <!--
@@ -572,9 +573,21 @@ WHERE {{
         <xsl:variable name="dateType" select="translate(normalize-space(@dateType), ' ', '_')"/>
         
         <xsl:if test="$textValue">
+          <xsl:variable name="dateValue">
+	    <xsl:call-template name="get_ISO8601_date">
+	      <xsl:with-param name="date" select="$textValue"/>
+	    </xsl:call-template>
+	  </xsl:variable>
+
           <field>
             <xsl:attribute name="name">
               <xsl:choose>
+                <xsl:when test="$dateValue and $dateType">
+                  <!-- XXX: seems like an odd assumption, to be able to create
+                       a (single valued) date field when we have both a Solr-formatted
+                       date value, and a date type... -->
+                  <xsl:value-of select="concat($prefix, 'date_', $dateType, '_dt')"/>
+                </xsl:when>
                 <xsl:when test="$dateType">
                   <xsl:value-of select="concat($prefix, 'date_', $dateType, $suffix)"/>
                 </xsl:when>
@@ -583,28 +596,36 @@ WHERE {{
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
-            
-            <xsl:value-of select="$textValue"/>
-          </field>
-          
-          <xsl:choose>
-	          <xsl:when test="substring-before($dateType, 'End')">
-	            <field>
-	              <xsl:attribute name="name">
-	                <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'End'), $suffix)"/>
-	              </xsl:attribute>
-	              <xsl:value-of select="$textValue"/>
-	            </field>
-	          </xsl:when>
-	          <xsl:when test="substring-before($dateType, 'Start')">
-              <field>
-                <xsl:attribute name="name">
-                  <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'Start'), $suffix)"/>
-                </xsl:attribute>
+
+            <xsl:choose>
+              <xsl:when test="$dateValue">
+                <xsl:value-of select="$dateValue"/>
+              </xsl:when>
+              <xsl:otherwise>
                 <xsl:value-of select="$textValue"/>
-              </field>
-            </xsl:when>
-	        </xsl:choose>
+              </xsl:otherwise>
+            </xsl:choose>
+          </field>
+         
+          <!-- created fields without end/start suffix -->
+	  <xsl:choose>
+	    <xsl:when test="substring-before($dateType, 'End')">
+	      <field>
+		<xsl:attribute name="name">
+		  <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'End'), $suffix)"/>
+		</xsl:attribute>
+		<xsl:value-of select="$textValue"/>
+	      </field>
+	    </xsl:when>
+	    <xsl:when test="substring-before($dateType, 'Start')">
+	       <field>
+		 <xsl:attribute name="name">
+		   <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'Start'), $suffix)"/>
+		 </xsl:attribute>
+		 <xsl:value-of select="$textValue"/>
+	       </field>
+	     </xsl:when>
+	  </xsl:choose>
         </xsl:if>
       </xsl:for-each>
       
