@@ -156,7 +156,9 @@ WHERE {
         <xsl:when test="$mimetype='text/xml' or $mimetype='application/rdf+xml'"><!-- XML -->
           <xsl:choose>
             <xsl:when test="@CONTROL_GROUP='X'"><!-- XML, but not inline -->
-              <xsl:apply-templates select="foxml:datastreamVersion[last()]/foxml:xmlContent"/>
+              <xsl:apply-templates select="foxml:datastreamVersion[last()]/foxml:xmlContent">
+                <xsl:with-param name="pid" select="$pid"/>
+              </xsl:apply-templates>
             </xsl:when>
             <xsl:otherwise>
               <xsl:apply-templates select="islandora-exts:getXMLDatastreamASNodeList($pid, $REPOSITORYNAME, @ID, $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)">
@@ -265,6 +267,7 @@ WHERE {{
 	<!-- ... and apply-templates on it -->
         <xsl:variable name="mods_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', substring-after(@uri, '/'), '/datastreams/MODS/content')"/>
         <xsl:apply-templates select="document($mods_url)/mods:mods">
+          <xsl:with-param name="pid" select="substring-after(@uri, '/')"/>                 
           <xsl:with-param name="prefix">collection_mods_</xsl:with-param>
         </xsl:apply-templates>
       </xsl:for-each>
@@ -847,7 +850,7 @@ WHERE {
           <xsl:variable name="ds_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', substring-after(@uri, '/'), '/datastreams/PBCORE/content')"/>
           <xsl:message>URL:  <xsl:value-of select="$ds_url"/></xsl:message>
           <xsl:apply-templates select="document($ds_url)/pb:pbcoreDescriptionDocument">
-            <xsl:with-param name="pid" select="$pid"/>
+            <xsl:with-param name="pid" select="substring-after(@uri, '/')"/>
             <xsl:with-param name="prefix" select="concat($prefix, 'parent_')"/>
             <xsl:with-param name="single_suffix" select="$single_suffix"/>
             <xsl:with-param name="suffix" select="$suffix"/>
