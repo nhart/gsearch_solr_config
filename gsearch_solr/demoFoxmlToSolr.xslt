@@ -777,6 +777,19 @@ WHERE {{
           </field>
         </xsl:if>
       </xsl:for-each>
+
+      <!-- index all identifiers (with type) -->
+      <xsl:for-each select="pb:pbcoreIdentifier[@source]">
+        <xsl:variable name="textValue" select="normalize-space(text())"/>
+        <xsl:if test="$textValue">
+          <field>
+            <xsl:attribute name="name">
+              <xsl:value-of select="concat($prefix, 'identifier_', @source, $suffix)"/>
+            </xsl:attribute>
+            <xsl:value-of select="$textValue"/>
+          </field>
+        </xsl:if>
+      </xsl:for-each>
       
       <!-- index all subjects -->
       <xsl:for-each select="pb:pbcoreSubject">
