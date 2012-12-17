@@ -569,6 +569,8 @@
   <dynamicField name="*_pi"  type="pint"    indexed="true"  stored="true"/>
    
   <dynamicField name="*_et" type="edgedText" indexed="true" stored="true" multiValued="true"/>
+
+  <dynamicField name="*_mdt" type="date"    indexed="true"  stored="true" multiValued="true"/>
    
    <dynamicField name="dc_*" type="text_general" indexed="true" stored="true" multiValued="true"/> 
    <dynamicField name="pb_*" type="text_general" indexed="true" stored="true" multiValued="true"/>
@@ -612,11 +614,57 @@
 	   
    <!-- <copyField source="*_t" dest="text" maxChars="3000"/> -->
    <copyField source="*_ms" dest="*_txt"/>
+   <copyField source="*" dest="catch_all_txt"/>
    <copyField source="pb_*" dest="pb_text_txt"/>
    <copyField source="pb_date_*" dest="pb_date_ms"/>
    <copyField source="pb_date_*" dest="pb_date_txt"/>
    <copyField source="pb_parent_date_*" dest="pb_date_ms"/>
    <copyField source="pb_parent_date_*" dest="pb_date_txt"/>
+
+   <!-- "concatenated" title field -->
+   <copyField source="pb_title_Main_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_title_Item_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_title_alternative_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_title_Series_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_title_International_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_title_Item_annotation_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_parent_title_Main_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_parent_title_Item_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_parent_title_alternative_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_parent_title_Series_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_parent_title_International_ms" dest="concatted_titles_txt"/>
+   <copyField source="mods_title_ms" dest="concatted_titles_txt"/>
+   <copyField source="pb_parent_title_Item_annotation_ms" dest="concatted_titles_txt"/>
+
+   <!-- "concatenated" date created field... -->
+   <copyField source="collection_mods_dateCreated_mdt" dest="concatted_date_created_mdt"/>
+   <copyField source="collection_mods_dateCreated_mdt" dest="concatted_date_mdt"/>
+   <copyField source="mods_dateCreated_mdt" dest="concatted_date_created_mdt"/>
+   <copyField source="mods_dateCreated_mdt" dest="concatted_date_mdt"/>
+   <copyField source="*_date_createdStart_dt" dest="concatted_date_created_mdt"/>
+   <copyField source="*_date_createdEnd_dt" dest="concatted_date_created_mdt"/>
+   <copyField source="*_date_createdStart_dt" dest="concatted_date_mdt"/>
+   <copyField source="*_date_createdEnd_dt" dest="concatted_date_mdt"/>
+   <!-- ...  and date published field -->
+   <copyField source="*_date_publishedStart_dt" dest="concatted_date_published_mdt"/>
+   <copyField source="*_date_publishedEnd_dt" dest="concatted_date_published_mdt"/>
+   <copyField source="*_date_publishedStart_dt" dest="concatted_date_mdt"/>
+   <copyField source="*_date_publishedEnd_dt" dest="concatted_date_mdt"/>
+
+   <!-- "concatenated" date created field with text type... -->
+   <copyField source="collection_mods_dateCreated_mdt" dest="concatted_date_created_txt"/>
+   <copyField source="collection_mods_dateCreated_mdt" dest="concatted_date_txt"/>
+   <copyField source="mods_dateCreated_mdt" dest="concatted_date_created_txt"/>
+   <copyField source="mods_dateCreated_mdt" dest="concatted_date_txt"/>
+   <copyField source="*_date_createdStart_dt" dest="concatted_date_created_txt"/>
+   <copyField source="*_date_createdEnd_dt" dest="concatted_date_created_txt"/>
+   <copyField source="*_date_createdStart_dt" dest="concatted_date_txt"/>
+   <copyField source="*_date_createdEnd_dt" dest="concatted_date_txt"/>
+   <!-- ...  and date published field -->
+   <copyField source="*_date_publishedStart_dt" dest="concatted_date_published_txt"/>
+   <copyField source="*_date_publishedEnd_dt" dest="concatted_date_published_txt"/>
+   <copyField source="*_date_publishedStart_dt" dest="concatted_date_txt"/>
+   <copyField source="*_date_publishedEnd_dt" dest="concatted_date_txt"/>
 
    <!-- copy name to alphaNameSort, a field designed for sorting by name -->
    <!-- <copyField source="name" dest="alphaNameSort"/> -->

@@ -735,7 +735,7 @@
       -->
     
        <lst name="appends">
-         <str name="fq">rels_hasModel_uri_ms:"usc:test-mezzanine"</str>
+         <str name="fq">+rels_hasModel_uri_ms:(usc\:test-mezzanine usc\:collectionCModel) +(pb_parent_title_Main_ms:[* TO *] mods_title_s:[* TO *])</str>
        </lst>
      
     <!-- "invariants" are a way of letting the Solr maintainer lock down
