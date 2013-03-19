@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:exts="xalan://dk.defxws.fedoragsearch.server.GenericOperationsImpl"
@@ -45,9 +45,9 @@
     <xsl:param name="FEDORAPASS" select="repositoryName"/>
     <xsl:param name="TRUSTSTOREPATH" select="repositoryName"/>
     <xsl:param name="TRUSTSTOREPASS" select="repositoryName"/>
-    
+
     <xsl:variable name="FEDORA" xmlns:java_string="xalan://java.lang.String" select="substring($FEDORASOAP, 1, java_string:lastIndexOf(java_string:new(string($FEDORASOAP)), '/'))"/>
-    
+
     <xsl:variable name="docBoost" select="1.4*2.5"/>
     <!-- or any other calculation, default boost is 1.0 -->
 
@@ -104,7 +104,7 @@ WHERE {
     }
   }
   UNION{
-    ?sub fm:hasModel &lt;info:fedora/usc:test-vro&gt; .
+    ?sub fm:hasModel &lt;info:fedora/usc:vroCModel&gt; .
     ?obj fre:isDerivativeOf ?sub .
   }
   ?obj fm:state fm:Active
@@ -134,7 +134,7 @@ WHERE {
     <xsl:template match="foxml:objectProperties/foxml:property">
       <xsl:param name="prefix">fgs.</xsl:param>
       <xsl:param name="suffix"></xsl:param>
-      
+
       <field>
         <xsl:attribute name="name">
           <xsl:value-of select="concat($prefix, substring-after(@NAME,'#'), $suffix)"/>
@@ -142,15 +142,15 @@ WHERE {
         <xsl:value-of select="@VALUE"/>
       </field>
     </xsl:template>
-    
+
     <xsl:template match="foxml:datastream[@STATE='A']">
       <xsl:param name="pid"/>
       <xsl:param name="mimetype" select="foxml:datastreamVersion[last()]/@MIMETYPE"/>
-      
+
       <field name="fedora_active_datastream_state">
         <xsl:value-of select="@ID"/>
       </field>
-    
+
       <!-- do different stuff, based on mimetype -->
       <xsl:choose>
         <xsl:when test="$mimetype='text/xml' or $mimetype='application/rdf+xml'"><!-- XML -->
@@ -178,29 +178,29 @@ WHERE {
         </xsl:otherwise>
       </xsl:choose>
     </xsl:template>
-    
+
     <xsl:template match="foxml:datastream[@STATE='I']">
       <xsl:param name="pid"/>
       <xsl:param name="mimetype" select="foxml:datastreamVersion[last()]/@MIMETYPE"/>
-      
+
       <field name="fedora_inactive_datastream_state">
         <xsl:value-of select="@ID"/>
       </field>
     </xsl:template>
-    
+
     <xsl:template match="foxml:datastream[@STATE='D']">
       <xsl:param name="pid"/>
       <xsl:param name="mimetype" select="foxml:datastreamVersion[last()]/@MIMETYPE"/>
-      
+
       <field name="fedora_deleted_datastream_state">
         <xsl:value-of select="@ID"/>
       </field>
     </xsl:template>
-    
+
     <xsl:template match="oai_dc:dc">
       <xsl:param name="prefix">dc_</xsl:param>
       <xsl:param name="suffix"></xsl:param>
-      
+
       <xsl:for-each select="./*">
         <xsl:variable name="text" select="normalize-space(text())"/>
         <xsl:if test="$text">
@@ -213,12 +213,12 @@ WHERE {
         </xsl:if>
       </xsl:for-each>
     </xsl:template>
-    
+
     <xsl:template match="foxml:digitalObject" mode="activeFedoraObject">
       <field name="PID" boost="2.5">
           <xsl:value-of select="@PID"/>
       </field>
-      
+
       <!-- allow every datastream a chance to get indexed. -->
       <xsl:apply-templates select="foxml:datastream">
         <xsl:with-param name="pid" select="@PID"/>
@@ -229,7 +229,7 @@ WHERE {
         <xsl:with-param name="full_pid" select="concat('info:fedora/', @PID)"/>
       </xsl:call-template>
     </xsl:template>
-    
+
     <xsl:template name="index_collection">
       <xsl:param name="full_pid"/>
 
@@ -241,17 +241,17 @@ PREFIX fre: &lt;info:fedora/fedora-system:def/relations-external#&gt;
 PREFIX fm: &lt;info:fedora/fedora-system:def/model#&gt;
 SELECT ?collection
 WHERE {{
-    &lt;<xsl:value-of select="$full_pid"/>&gt; fm:hasModel &lt;info:fedora/usc:test-vro&gt; ; 
+    &lt;<xsl:value-of select="$full_pid"/>&gt; fm:hasModel &lt;info:fedora/usc:vroCModel&gt; ;
                                                fre:isMemberOfCollection ?collection .
   }
   UNION {
-    &lt;<xsl:value-of select="$full_pid"/>&gt; fm:hasModel &lt;info:fedora/usc:test-mezzanine&gt; ;
+    &lt;<xsl:value-of select="$full_pid"/>&gt; fm:hasModel &lt;info:fedora/usc:mezzanineCModel&gt; ;
                                                fre:isDerivativeOf ?vro .
     ?vro fre:isMemberOfCollection ?collection .
   }
   UNION {
     <!-- XXX: The model URI is in the wrong namespace for access copies. -->
-    &lt;<xsl:value-of select="$full_pid"/>&gt; fre:hasModel &lt;info:fedora/usc:test-access&gt; ;
+    &lt;<xsl:value-of select="$full_pid"/>&gt; fre:hasModel &lt;info:fedora/usc:accessCModel&gt; ;
                                                fre:isDerivativeOf ?mezz .
     ?mezz fre:isDerivativeOf ?vro1 .
     ?vro1 fre:isMemberOfCollection ?collection .
@@ -267,7 +267,7 @@ WHERE {{
 	<!-- ... and apply-templates on it -->
         <xsl:variable name="mods_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', substring-after(@uri, '/'), '/datastreams/MODS/content')"/>
         <xsl:apply-templates select="document($mods_url)/mods:mods">
-          <xsl:with-param name="pid" select="substring-after(@uri, '/')"/>                 
+          <xsl:with-param name="pid" select="substring-after(@uri, '/')"/>
           <xsl:with-param name="prefix">collection_mods_</xsl:with-param>
         </xsl:apply-templates>
       </xsl:for-each>
@@ -278,7 +278,7 @@ WHERE {{
       <xsl:param name="suffix">_ms</xsl:param>
       <xsl:param name="text"/>
       <xsl:param name="dsid">OBJ</xsl:param>
-      
+
       <field>
         <xsl:attribute name="name">
           <xsl:value-of select="concat($prefix, $dsid, $suffix)"/>
@@ -286,19 +286,19 @@ WHERE {{
         <xsl:value-of select="$text"/>
       </field>
     </xsl:template>
-    
-    
+
+
     <!-- **** General RDF indexing **** -->
     <!-- add RDF URI -->
     <xsl:template match="*[@rdf:resource]" mode="rdf">
       <xsl:param name="prefix">rels_</xsl:param>
       <xsl:param name="suffix"></xsl:param>
-      
+
       <field>
         <xsl:attribute name="name">
           <xsl:value-of select="concat($prefix, local-name(), '_uri', $suffix)"/>
         </xsl:attribute>
-        
+
         <xsl:variable name="subbed" select="substring-after(@rdf:resource, 'info:fedora/')"/>
         <xsl:choose>
           <!-- account for relationships to arbitrary URIs -->
@@ -311,21 +311,21 @@ WHERE {{
         </xsl:choose>
       </field>
     </xsl:template>
-    
+
     <!-- add RDF literal -->
     <xsl:template match="*[normalize-space(text())]" mode="rdf">
       <xsl:param name="prefix">rels_</xsl:param>
       <xsl:param name="suffix"></xsl:param>
-      
+
       <field>
         <xsl:attribute name="name">
           <xsl:value-of select="concat($prefix, local-name(), '_literal', $suffix)"/>
         </xsl:attribute>
-        
+
         <xsl:value-of select="normalize-space(text())"/>
       </field>
     </xsl:template>
-    
+
     <!-- kick off RDF indexing -->
     <xsl:template match="rdf:Description | rdf:description" mode="rdf">
       <xsl:param name="prefix">rels_</xsl:param>
@@ -333,7 +333,7 @@ WHERE {{
 
       <xsl:variable name="pid_dsid" select="substring-after(@rdf:about, '/')"/>
       <xsl:variable name="dsid" select="substring-after($pid_dsid, '/')"/>
-      
+
       <xsl:choose>
         <!-- probably adding in the dsid, since there's something after info:fedora/$PID -->
         <xsl:when test="$dsid">
@@ -350,31 +350,31 @@ WHERE {{
         </xsl:otherwise>
       </xsl:choose>
     </xsl:template>
-    
+
     <!-- index children... -->
     <xsl:template match="*" mode="rdf">
       <xsl:param name="prefix">rels_</xsl:param>
       <xsl:param name="suffix">_ms</xsl:param>
-      
+
       <xsl:apply-templates mode="rdf">
         <xsl:with-param name="prefix" select="$prefix"/>
         <xsl:with-param name="suffix" select="$suffix"/>
       </xsl:apply-templates>
     </xsl:template>
-    
+
     <xsl:template match="text()" mode="rdf"/>
-    
+
     <xsl:template match="rdf:RDF">
       <xsl:param name="prefix">rels_</xsl:param>
       <xsl:param name="suffix">_ms</xsl:param>
-      
+
       <xsl:apply-templates mode="rdf">
         <xsl:with-param name="prefix" select="$prefix"/>
         <xsl:with-param name="suffix" select="$suffix"/>
       </xsl:apply-templates>
     </xsl:template>
     <!-- **** END RDF **** -->
-    
+
     <!-- Basic EAC-CPF -->
     <xsl:template match="eaccpf:eac-cpf">
       <xsl:param name="pid"/>
@@ -456,8 +456,8 @@ WHERE {{
         </xsl:choose>
       </field>
     </xsl:template>
-    
-    <!-- 
+
+    <!--
     General MODS indexing...
     FIXME: For optimization, it would be best to get rid of all the global (//) selectors. -->
     <xsl:template match="mods:mods">
@@ -465,7 +465,7 @@ WHERE {{
       <xsl:param name="prefix">mods_</xsl:param>  <!-- Prefix for field names -->
       <xsl:param name="single_suffix">_s</xsl:param>  <!-- Suffix for fields with a single value -->
       <xsl:param name="suffix">_ms</xsl:param>       <!-- Suffix for multivalued fields -->
-      
+
       <xsl:for-each select=".//mods:title[normalize-space(text())]">
         <field>
           <xsl:attribute name="name">
@@ -509,7 +509,7 @@ WHERE {{
           </xsl:if>
         </xsl:if>
       </xsl:for-each>
-      
+
       <!-- Many elements get transformed in the same manner... -->
       <xsl:for-each select=".//mods:subTitle | .//mods:abstract | .//mods:genre | .//mods:form | .//mods:note[not(@type='statement of responsibility')] | .//mods:topic | .//mods:geographic | .//mods:caption | .//mods:extent | .//mods:accessCondition | .//mods:country | .//mods:county | .//mods:province | .//mods:region | .//mods:city | .//mods:citySection | .//mods:originInfo/mods:issuance | .//mods:physicalLocation | .//mods:identifier | .//mods:originInfo/mods:edition | .//mods:originInfo/mods:publisher">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
@@ -522,19 +522,19 @@ WHERE {{
           </field>
         </xsl:if>
       </xsl:for-each>
-        
+
       <!-- get all the names... -->
       <xsl:for-each select=".//mods:name">
         <xsl:variable name="authority_uri" select="@valueURI"/>
         <xsl:variable name="role" select="normalize-space(mods:role/mods:roleTerm/text())"/>
         <xsl:variable name="name" select="normalize-space(mods:namePart/text())"/>
-        
+
         <!-- They'll only get used if they have a role and namePart value, though -->
         <xsl:choose>
           <xsl:when test="$role and $authority_uri">
             <xsl:variable name="authority_type" select="substring-before($authority_uri, '/')"/>
             <xsl:variable name="remaining" select="substring-after($authority_uri, '/')"/>
-            
+
             <xsl:choose>
               <xsl:when test="$authority_type='info:fedora'">
                 <xsl:variable name="pid" select="substring-before($remaining, '/')"/>
@@ -550,7 +550,7 @@ WHERE {{
                   </xsl:choose>
                 </xsl:variable>
                 <xsl:variable name="xml_id" select="substring-after($full_fragment, '#')"/>
-                
+
                 <!-- TODO:  Load the DS and build the name entry... -->
                 <xsl:variable name="extracted_name">
                   <!--<xsl:choose>
@@ -561,7 +561,7 @@ WHERE {{
                     </xsl:otherwise>
                   </xsl:choose>-->
                 </xsl:variable>
-                
+
                 <xsl:if test="$extracted_name">
                   <field>
                     <xsl:attribute name="name">
@@ -622,7 +622,7 @@ WHERE {{
           </field>
         </xsl:if>
       </xsl:for-each>
-      
+
       <xsl:for-each select=".//mods:physicalDescription/*">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
         <xsl:if test="$textValue">
@@ -659,18 +659,18 @@ WHERE {{
         </xsl:if>
       </xsl:for-each>
     </xsl:template>
-    
+
     <xsl:template match="pb:pbcoreDescriptionDocument">
       <xsl:param name="pid"/>
       <xsl:param name="prefix">pb_</xsl:param>  <!-- Prefix for field names -->
       <xsl:param name="single_suffix">_s</xsl:param>  <!-- Suffix for fields with a single value -->
       <xsl:param name="suffix">_ms</xsl:param>       <!-- Suffix for multivalued fields -->
-      
+
       <!--  index dates (with types) -->
       <xsl:for-each select="pb:pbcoreAssetDate">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
         <xsl:variable name="dateType" select="translate(normalize-space(@dateType), ' ', '_')"/>
-        
+
         <xsl:if test="$textValue">
           <xsl:variable name="dateValue">
 	    <xsl:call-template name="get_ISO8601_date">
@@ -705,7 +705,7 @@ WHERE {{
               </xsl:otherwise>
             </xsl:choose>
           </field>
-         
+
           <!-- created fields without end/start suffix -->
 	  <xsl:choose>
 	    <xsl:when test="substring-before($dateType, 'End')">
@@ -727,7 +727,7 @@ WHERE {{
 	  </xsl:choose>
         </xsl:if>
       </xsl:for-each>
-      
+
       <!-- index all descriptions (with type) -->
       <xsl:for-each select="pb:pbcoreDescription">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
@@ -748,7 +748,7 @@ WHERE {{
           </field>
         </xsl:if>
       </xsl:for-each>
-      
+
       <!-- index all titles (with type) -->
       <xsl:for-each select="pb:pbcoreTitle">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
@@ -790,7 +790,7 @@ WHERE {{
           </field>
         </xsl:if>
       </xsl:for-each>
-      
+
       <!-- index all subjects -->
       <xsl:for-each select="pb:pbcoreSubject">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
@@ -824,7 +824,7 @@ WHERE {{
           </field>
         </xsl:if>
       </xsl:for-each>
-      
+
       <!-- index the instantiations with a dedicated template -->
       <xsl:apply-templates select="pb:pbcoreInstantiation">
         <xsl:with-param name="pid" select="$pid"/>
@@ -832,14 +832,14 @@ WHERE {{
         <xsl:with-param name="suffix" select="$suffix"/>
       </xsl:apply-templates>
     </xsl:template>
-    
+
     <!-- index chunks of the instantiation itself -->
     <xsl:template match="pb:pbcoreInstantiation | pb:pbcoreInstantiationDocument">
       <xsl:param name="pid"/>
       <xsl:param name="prefix">pb_</xsl:param>
       <xsl:param name="single_suffix">_s</xsl:param>
       <xsl:param name="suffix">_ms</xsl:param>
-      
+
       <xsl:if test="local-name()='pbcoreInstantiationDocument'">
         <xsl:variable name="parent">
           <xsl:call-template name="perform_query">
@@ -849,16 +849,16 @@ PREFIX fm: &lt;info:fedora/fedora-system:def/model#&gt;
 SELECT ?parent
 WHERE {
   &lt;<xsl:value-of select="concat('info:fedora/', $pid)"/>&gt; fre:isDerivativeOf ?parent ;
-                                             fm:hasModel &lt;info:fedora/usc:test-mezzanine&gt; ;
+                                             fm:hasModel &lt;info:fedora/usc:mezzanineCModel&gt; ;
                                              fm:state fm:Active .
   ?parent fm:state fm:Active ;
-          fm:hasModel &lt;info:fedora/usc:test-vro&gt; .
+          fm:hasModel &lt;info:fedora/usc:vroCModel&gt; .
 }
             </xsl:with-param>
             <xsl:with-param name="lang">sparql</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:for-each select="xalan:nodeset($parent)/sparql:sparql/sparql:results/sparql:result/sparql:parent">
           <xsl:variable name="ds_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', substring-after(@uri, '/'), '/datastreams/PBCORE/content')"/>
           <xsl:message>URL:  <xsl:value-of select="$ds_url"/></xsl:message>
@@ -870,7 +870,7 @@ WHERE {
           </xsl:apply-templates>
         </xsl:for-each>
       </xsl:if>
-      
+
       <xsl:for-each select="pb:instantiationIdentifier[@source='instantiation_title'] | pb:instantiationAnnotation[@annotationType='instantiation_title']">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
         <xsl:if test="$textValue">
@@ -882,7 +882,7 @@ WHERE {
           </field>
         </xsl:if>
       </xsl:for-each>
-      
+
       <xsl:for-each select="pb:instantiationAnnotation[@annotationType='abstract']">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
         <xsl:if test="$textValue">
@@ -894,7 +894,7 @@ WHERE {
           </field>
         </xsl:if>
       </xsl:for-each>
-      
+
       <xsl:for-each select="pb:instantiationDuration">
         <xsl:variable name="textValue" select="normalize-space(text())"/>
         <xsl:if test="$textValue">
@@ -919,7 +919,7 @@ WHERE {
         </xsl:if>
       </xsl:for-each>
     </xsl:template>
-    
+
     <xsl:template match="text()">
       <xsl:param name="pid"/>
     </xsl:template>
@@ -929,16 +929,16 @@ WHERE {
         <xsl:with-param name="pid" select="$pid"/>
       </xsl:apply-templates>
     </xsl:template>
-    
+
     <xsl:template name="perform_query">
       <xsl:param name="query" select="no_query"/>
       <xsl:param name="lang" select="'itql'"/>
       <xsl:param name="additional_params" select="''"/>
       <xsl:param name="RISEARCH" select="concat($FEDORA, '/risearch')"/>
-      
+
       <xsl:variable name="encoded_query" select="encoder:encode(normalize-space($query))"/>
       <?xalan-doc-cache-off?>
-      
+
       <xsl:variable name="query_url" select="concat($RISEARCH, '?query=', $encoded_query, '&amp;lang=', $lang, $additional_params)"/>
       <xsl:message>RI Query:  <xsl:value-of select="$query_url"/></xsl:message>
       <xsl:copy-of select="document($query_url)"/>
