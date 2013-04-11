@@ -2,7 +2,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:exts="xalan://dk.defxws.fedoragsearch.server.GenericOperationsImpl"
-    xmlns:islandora-exts="xalan://ca.upei.roblib.DataStreamForXSLT"
     xmlns:zs="http://www.loc.gov/zing/srw/"
     xmlns:foxml="info:fedora/fedora-system:def/foxml#"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -24,7 +23,7 @@
     xmlns:eaccpf="urn:isbn:1-931666-33-4"
     xmlns:sparql="http://www.w3.org/2001/sw/DataAccess/rf1/result"
     xmlns:encoder="xalan://java.net.URLEncoder"
-    exclude-result-prefixes="exts islandora-exts zs foxml dc oai_dc tei mods rdf rdfs fedora rel fractions compounds critters dwc fedora-model uvalibdesc pb uvalibadmin eaccpf xalan sparql encoder">
+    exclude-result-prefixes="exts zs foxml dc oai_dc tei mods rdf rdfs fedora rel fractions compounds critters dwc fedora-model uvalibdesc pb uvalibadmin eaccpf xalan sparql encoder">
     <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/gsearch_solr/xslt-date-template.xslt"/>
     <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/gsearch_solr/traverse-graph.xslt"/>
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
@@ -161,7 +160,8 @@ WHERE {
               </xsl:apply-templates>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:apply-templates select="islandora-exts:getXMLDatastreamASNodeList($pid, $REPOSITORYNAME, @ID, $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)">
+              <xsl:variable name="ds_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', $pid, '/datastreams/', @ID,'/content')"/>
+              <xsl:apply-templates select="document($ds_url)">
                 <xsl:with-param name="pid" select="$pid"/>
               </xsl:apply-templates>
             </xsl:otherwise>
@@ -169,7 +169,7 @@ WHERE {
         </xsl:when>
         <xsl:when test="$mimetype='text/plain'">
           <xsl:call-template name="plaintext">
-            <xsl:with-param name="text" select="islandora-exts:getDatastreamTextRaw($pid, $REPOSITORYNAME, @ID, $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)"/>
+            <xsl:with-param name="text" select="exts:getDatastreamText($pid, $REPOSITORYNAME, @ID, $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)"/>
             <xsl:with-param name="dsid" select="@ID"/>
           </xsl:call-template>
         </xsl:when>
