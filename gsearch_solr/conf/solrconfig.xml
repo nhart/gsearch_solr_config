@@ -734,10 +734,6 @@
          unless you are sure you always want it.
       -->
 
-       <lst name="appends">
-         <str name="fq">+rels_hasModel_uri_ms:(usc\:mezzanineCModel usc\:collectionCModel) +(pb_parent_title_Main_ms:[* TO *] mods_title_s:[* TO *])</str>
-       </lst>
-
     <!-- "invariants" are a way of letting the Solr maintainer lock down
          the options available to Solr clients.  Any params values
          specified here are used regardless of what values may be specified
