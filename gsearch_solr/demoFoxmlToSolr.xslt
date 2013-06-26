@@ -152,7 +152,8 @@ WHERE {
 
       <!-- do different stuff, based on mimetype -->
       <xsl:choose>
-        <xsl:when test="$mimetype='text/xml' or $mimetype='application/rdf+xml'"><!-- XML -->
+        <!-- XML -->
+        <xsl:when test="$mimetype='text/xml' or $mimetype='application/rdf+xml' or $mimetype='application/xml'">
           <xsl:choose>
             <xsl:when test="@CONTROL_GROUP='X'"><!-- XML, but not inline -->
               <xsl:apply-templates select="foxml:datastreamVersion[last()]/foxml:xmlContent">
