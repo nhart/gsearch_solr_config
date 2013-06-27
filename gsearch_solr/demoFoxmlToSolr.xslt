@@ -682,7 +682,7 @@ WHERE {{
           <field>
             <xsl:attribute name="name">
               <xsl:choose>
-                <xsl:when test="$dateValue and $dateType">
+                <xsl:when test="$dateValue != '' and $dateType != ''">
                   <!-- XXX: seems like an odd assumption, to be able to create
                        a (single valued) date field when we have both a Solr-formatted
                        date value, and a date type... -->
@@ -698,7 +698,7 @@ WHERE {{
             </xsl:attribute>
 
             <xsl:choose>
-              <xsl:when test="$dateValue">
+              <xsl:when test="$dateValue != ''">
                 <xsl:value-of select="$dateValue"/>
               </xsl:when>
               <xsl:otherwise>
