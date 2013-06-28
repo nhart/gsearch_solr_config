@@ -94,7 +94,7 @@
       <xsl:param name="risearch">http://localhost:8080/fedora/risearch</xsl:param>
       <xsl:param name="query"/>
       <xsl:param name="lang">itql</xsl:param>
-      <xsl:param name="additional_params">&amp;limit=10</xsl:param>
+      <xsl:param name="additional_params"/>
       
       <xsl:variable name="encoded_query" select="encoder:encode(normalize-space($query))"/>
       
