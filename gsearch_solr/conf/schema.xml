@@ -636,6 +636,10 @@
    <copyField source="mods_title_ms" dest="concatted_titles_txt"/>
    <copyField source="pb_parent_title_Item_annotation_ms" dest="concatted_titles_txt"/>
 
+   <!-- Copy "parent" PBCore to "regular" PBCore, for consistent searching... -->
+   <copyField source="pb_parent_*_ms" dest="pb_*_ms"/>
+   <copyField source="pb_parent_*_ms" dest="pb_*_txt"/>
+
    <!-- "concatenated" date created field... -->
    <copyField source="collection_mods_dateCreated_mdt" dest="concatted_date_created_mdt"/>
    <copyField source="collection_mods_dateCreated_mdt" dest="concatted_date_mdt"/>
