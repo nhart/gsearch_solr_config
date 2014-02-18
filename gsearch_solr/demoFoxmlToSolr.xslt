@@ -826,6 +826,27 @@ WHERE {{
         </xsl:if>
       </xsl:for-each>
 
+     <!-- index all Rights Summary -->
+     <xsl:for-each select="pb:pbcoreRightsSummary/pb:rightsSummary">
+       <xsl:variable name="textValue" select="normalize-space(text())"/>
+       <xsl:variable name="rightsSource" select="normalize-space(@source)"/>
+       <xsl:if test="$textValue">
+         <field>
+           <xsl:attribute name="name">
+             <xsl:choose>
+               <xsl:when test="$rightsSource"> 
+                 <xsl:value-of select="concat($prefix, local-name(), '_' ,$rightsSource, $suffix)"/>
+               </xsl:when>
+               <xsl:otherwise>
+                 <xsl:value-of select="concat($prefix, local-name(), $suffix)"/>
+               </xsl:otherwise>
+             </xsl:choose>
+           </xsl:attribute>
+           <xsl:value-of select="$textValue"/>
+         </field>
+          </xsl:if>
+      </xsl:for-each>
+
       <!-- index the instantiations with a dedicated template -->
       <xsl:apply-templates select="pb:pbcoreInstantiation">
         <xsl:with-param name="pid" select="$pid"/>
