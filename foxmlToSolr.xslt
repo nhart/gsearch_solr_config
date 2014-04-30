@@ -24,8 +24,8 @@
     xmlns:sparql="http://www.w3.org/2001/sw/DataAccess/rf1/result"
     xmlns:encoder="xalan://java.net.URLEncoder"
     exclude-result-prefixes="exts zs foxml dc oai_dc tei mods rdf rdfs fedora rel fractions compounds critters dwc fedora-model uvalibdesc pb uvalibadmin eaccpf xalan sparql encoder">
-    <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/gsearch_solr/xslt-date-template.xslt"/>
-    <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/gsearch_solr/traverse-graph.xslt"/>
+    <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/xslt-date-template.xslt"/>
+    <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/traverse-graph.xslt"/>
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
     <!--
