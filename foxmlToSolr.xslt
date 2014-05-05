@@ -205,7 +205,7 @@ WHERE {
     </xsl:template>
 
     <xsl:template match="foxml:digitalObject" mode="activeFedoraObject">
-      <field name="PID" boost="2.5">
+      <field name="PID">
           <xsl:value-of select="@PID"/>
       </field>
 
