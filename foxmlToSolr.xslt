@@ -24,8 +24,9 @@
     xmlns:sparql="http://www.w3.org/2001/sw/DataAccess/rf1/result"
     xmlns:encoder="xalan://java.net.URLEncoder"
     exclude-result-prefixes="exts zs foxml dc oai_dc tei mods rdf rdfs fedora rel fractions compounds critters dwc fedora-model uvalibdesc pb uvalibadmin eaccpf xalan sparql encoder">
-    <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/gsearch_solr/xslt-date-template.xslt"/>
-    <xsl:import href="file:///fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/gsearch_solr/traverse-graph.xslt"/>
+    <xsl:import href="file:///usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/xslt-date-template.xslt"/>
+    <xsl:import href="file:///usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/traverse-graph.xslt"/>
+    <xsl:include href="file:///usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/FOXML_properties_to_solr.xslt"/>
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
     <!--
@@ -130,18 +131,6 @@ WHERE {
       </update>
     </xsl:template>
 
-    <xsl:template match="foxml:objectProperties/foxml:property">
-      <xsl:param name="prefix">fgs.</xsl:param>
-      <xsl:param name="suffix"></xsl:param>
-
-      <field>
-        <xsl:attribute name="name">
-          <xsl:value-of select="concat($prefix, substring-after(@NAME,'#'), $suffix)"/>
-        </xsl:attribute>
-        <xsl:value-of select="@VALUE"/>
-      </field>
-    </xsl:template>
-
     <xsl:template match="foxml:datastream[@STATE='A']">
       <xsl:param name="pid"/>
       <xsl:param name="mimetype" select="foxml:datastreamVersion[last()]/@MIMETYPE"/>
@@ -216,7 +205,7 @@ WHERE {
     </xsl:template>
 
     <xsl:template match="foxml:digitalObject" mode="activeFedoraObject">
-      <field name="PID" boost="2.5">
+      <field name="PID">
           <xsl:value-of select="@PID"/>
       </field>
 
@@ -225,6 +214,7 @@ WHERE {
         <xsl:with-param name="pid" select="@PID"/>
       </xsl:apply-templates>
 
+      <xsl:apply-templates select="foxml:objectProperties"/> 
       <!-- index info from the collection -->
       <xsl:call-template name="index_collection">
         <xsl:with-param name="full_pid" select="concat('info:fedora/', @PID)"/>
@@ -266,6 +256,9 @@ WHERE {{
       <xsl:for-each select="xalan:nodeset($results)/sparql:sparql/sparql:results/sparql:result/sparql:collection">
 	<!-- get the MODS from the collection object... -->
 	<!-- ... and apply-templates on it -->
+        <field name="usc_parent_collection_pid_ms">
+          <xsl:value-of select="substring-after(@uri, '/')"/>
+        </field>
         <xsl:variable name="mods_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', substring-after(@uri, '/'), '/datastreams/MODS/content')"/>
         <xsl:apply-templates select="document($mods_url)/mods:mods">
           <xsl:with-param name="pid" select="substring-after(@uri, '/')"/>
