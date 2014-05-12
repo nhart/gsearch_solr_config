@@ -1,1 +1,5 @@
 The 'index' directory inside of gsearch config
+
+Note the 7.x-puppet branch is setup to follow DGI standard format. 
+
+This format allows automation for dev environments using puppet.
