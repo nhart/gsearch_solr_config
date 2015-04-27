@@ -838,7 +838,21 @@ WHERE {{
            <xsl:value-of select="$textValue"/>
          </field>
           </xsl:if>
-      </xsl:for-each>
+     </xsl:for-each>
+      
+      <!-- index all Contributors -->
+      <xsl:for-each select="pb:pbcoreContributor">
+        <xsl:variable name="textValue" select="normalize-space(./pb:contributor/text())"/>
+        <xsl:if test="$textValue">
+          <field>
+            <xsl:attribute name="name">
+              <xsl:value-of select="concat($prefix, local-name(), $suffix)"/>
+            </xsl:attribute>
+            <xsl:value-of select="$textValue"/>
+          </field>
+        </xsl:if>
+      </xsl:for-each>      
+      
 
       <!-- index the instantiations with a dedicated template -->
       <xsl:apply-templates select="pb:pbcoreInstantiation">
