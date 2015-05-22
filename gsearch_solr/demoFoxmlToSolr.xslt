@@ -30,7 +30,7 @@
     <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
     <!--
-	 This xslt stylesheet generates the Solr doc element consisting of field elements
+   This xslt stylesheet generates the Solr doc element consisting of field elements
      from a FOXML record. The PID field is mandatory.
      Options for tailoring:
        - generation of fields from other XML metadata streams than DC
@@ -74,16 +74,16 @@
         </xsl:choose>
 
         <xsl:variable name="graph">
-	  <xsl:call-template name="_traverse_graph">
+    <xsl:call-template name="_traverse_graph">
             <xsl:with-param name="risearch" select="concat($FEDORA, '/risearch')"/>
-	    <xsl:with-param name="to_traverse_in">
-	      <sparql:result>
-		<sparql:obj>
-		  <xsl:attribute name="uri">info:fedora/<xsl:value-of select="@PID"/></xsl:attribute>
-		</sparql:obj>
-	      </sparql:result>
-	    </xsl:with-param>
-	    <xsl:with-param name="query">
+      <xsl:with-param name="to_traverse_in">
+        <sparql:result>
+    <sparql:obj>
+      <xsl:attribute name="uri">info:fedora/<xsl:value-of select="@PID"/></xsl:attribute>
+    </sparql:obj>
+        </sparql:result>
+      </xsl:with-param>
+      <xsl:with-param name="query">
 PREFIX fre: &lt;info:fedora/fedora-system:def/relations-external#&gt;
 PREFIX fm: &lt;info:fedora/fedora-system:def/model#&gt;
 SELECT ?obj
@@ -110,23 +110,23 @@ WHERE {
   ?obj fm:state fm:Active
   FILTER(sameTerm(?sub, &lt;%PID_URI%&gt;))
 }
-	    </xsl:with-param>
-	  </xsl:call-template>
+      </xsl:with-param>
+    </xsl:call-template>
         </xsl:variable>
         <add commitWithin="5000">
-	  <xsl:for-each select="xalan:nodeset($graph)//sparql:obj">
-	    <xsl:variable name="xml_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', substring-after(@uri, '/'), '/objectXML')"/>
+    <xsl:for-each select="xalan:nodeset($graph)//sparql:obj">
+      <xsl:variable name="xml_url" select="concat(substring-before($FEDORA, '://'), '://', encoder:encode($FEDORAUSER), ':', encoder:encode($FEDORAPASS), '@', substring-after($FEDORA, '://') , '/objects/', substring-after(@uri, '/'), '/objectXML')"/>
             <!-- XXX: This requires a custom URIResolver...  The default doesn't handle HTTP basic auth... -->
             <xsl:variable name="object" select="document($xml_url)"/>
             <xsl:if test="$object">
-	      <doc>
-		<xsl:attribute name="boost">
-		    <xsl:value-of select="$docBoost"/>
-		</xsl:attribute>
-		<xsl:apply-templates select="$object/foxml:digitalObject" mode="activeFedoraObject"/>
-	      </doc>
+        <doc>
+    <xsl:attribute name="boost">
+        <xsl:value-of select="$docBoost"/>
+    </xsl:attribute>
+    <xsl:apply-templates select="$object/foxml:digitalObject" mode="activeFedoraObject"/>
+        </doc>
             </xsl:if>
-	  </xsl:for-each>
+    </xsl:for-each>
         </add>
       </update>
     </xsl:template>
@@ -487,19 +487,19 @@ WHERE {{
           </field>
 
           <xsl:if test="@point">
-	    <xsl:variable name="dateValue">
-	      <xsl:call-template name="get_ISO8601_date">
-		<xsl:with-param name="date" select="$textValue"/>
-	      </xsl:call-template>
-	    </xsl:variable>
-	    <xsl:if test="$dateValue">
-	      <field>
-		<xsl:attribute name="name">
-		  <xsl:value-of select="concat($prefix, local-name(), '_mdt')"/>
+      <xsl:variable name="dateValue">
+        <xsl:call-template name="get_ISO8601_date">
+    <xsl:with-param name="date" select="$textValue"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="$dateValue">
+        <field>
+    <xsl:attribute name="name">
+      <xsl:value-of select="concat($prefix, local-name(), '_mdt')"/>
                 </xsl:attribute>
-		<xsl:value-of select="$dateValue"/>
-	      </field>
-	    </xsl:if>
+    <xsl:value-of select="$dateValue"/>
+        </field>
+      </xsl:if>
           </xsl:if>
         </xsl:if>
       </xsl:for-each>
@@ -667,10 +667,10 @@ WHERE {{
 
         <xsl:if test="$textValue">
           <xsl:variable name="dateValue">
-	    <xsl:call-template name="get_ISO8601_date">
-	      <xsl:with-param name="date" select="$textValue"/>
-	    </xsl:call-template>
-	  </xsl:variable>
+      <xsl:call-template name="get_ISO8601_date">
+        <xsl:with-param name="date" select="$textValue"/>
+      </xsl:call-template>
+    </xsl:variable>
 
           <field>
             <xsl:attribute name="name">
@@ -701,24 +701,24 @@ WHERE {{
           </field>
 
           <!-- created fields without end/start suffix -->
-	  <xsl:choose>
-	    <xsl:when test="substring-before($dateType, 'End')">
-	      <field>
-		<xsl:attribute name="name">
-		  <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'End'), $suffix)"/>
-		</xsl:attribute>
-		<xsl:value-of select="$textValue"/>
-	      </field>
-	    </xsl:when>
-	    <xsl:when test="substring-before($dateType, 'Start')">
-	       <field>
-		 <xsl:attribute name="name">
-		   <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'Start'), $suffix)"/>
-		 </xsl:attribute>
-		 <xsl:value-of select="$textValue"/>
-	       </field>
-	     </xsl:when>
-	  </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="substring-before($dateType, 'End')">
+        <field>
+    <xsl:attribute name="name">
+      <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'End'), $suffix)"/>
+    </xsl:attribute>
+    <xsl:value-of select="$textValue"/>
+        </field>
+      </xsl:when>
+      <xsl:when test="substring-before($dateType, 'Start')">
+         <field>
+     <xsl:attribute name="name">
+       <xsl:value-of select="concat($prefix, 'date_', substring-before($dateType, 'Start'), $suffix)"/>
+     </xsl:attribute>
+     <xsl:value-of select="$textValue"/>
+         </field>
+       </xsl:when>
+    </xsl:choose>
         </xsl:if>
       </xsl:for-each>
 
@@ -838,7 +838,21 @@ WHERE {{
            <xsl:value-of select="$textValue"/>
          </field>
           </xsl:if>
-      </xsl:for-each>
+     </xsl:for-each>
+      
+      <!-- index all Contributors -->
+      <xsl:for-each select="pb:pbcoreContributor">
+        <xsl:variable name="textValue" select="normalize-space(./pb:contributor/text())"/>
+        <xsl:if test="$textValue">
+          <field>
+            <xsl:attribute name="name">
+              <xsl:value-of select="concat($prefix, local-name(), $suffix)"/>
+            </xsl:attribute>
+            <xsl:value-of select="$textValue"/>
+          </field>
+        </xsl:if>
+      </xsl:for-each>      
+      
 
       <!-- index the instantiations with a dedicated template -->
       <xsl:apply-templates select="pb:pbcoreInstantiation">
@@ -959,4 +973,3 @@ WHERE {
       <xsl:copy-of select="document($query_url)"/>
     </xsl:template>
 </xsl:stylesheet>
-
